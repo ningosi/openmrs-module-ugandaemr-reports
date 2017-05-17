@@ -128,7 +128,16 @@
         "label": "ANC Register",
         "url": "reportingui/runReport.page?reportDefinition=d63d0202-25ca-11e7-8479-507b9dc4c741",
         "order": 20
+      },
+      {
+        "id": "Safe Male Circumcision Register",
+        "extensionPointId": "org.openmrs.module.ugandaemr.reports.registers",
+        "type": "link",
+        "label": "Safe Male Circumcision Register",
+        "url": "reportingui/runReport.page?reportDefinition=c1122646-3b37-11e7-aa22-507b9dc4c741",
+        "order": 22
       }
+
     ]
   }
 ]
