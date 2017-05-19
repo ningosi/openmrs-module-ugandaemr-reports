@@ -13,12 +13,22 @@
  */
 package org.openmrs.module.ugandaemrreports.reporting.reports;
 
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.module.metadatadeploy.MetadataUtils;
+import org.openmrs.module.reporting.data.DataDefinition;
+import org.openmrs.module.reporting.data.converter.DataConverter;
+import org.openmrs.module.reporting.data.converter.ObjectFormatter;
+import org.openmrs.module.reporting.data.patient.definition.ConvertedPatientDataDefinition;
+import org.openmrs.module.reporting.data.patient.definition.EncountersForPatientDataDefinition;
+import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
+import org.openmrs.module.ugandaemrreports.data.converter.EncounterDataDefinitionConverter;
 import org.openmrs.module.ugandaemrreports.library.Cohorts;
 import org.openmrs.module.ugandaemrreports.library.DataFactory;
 import org.openmrs.module.ugandaemrreports.reporting.dataset.definition.SharedDataDefintion;
@@ -94,7 +104,7 @@ public class SetupSMCRegister extends UgandaEMRDataExportManager {
         rd.setName(getName());
         rd.setDescription(getDescription());
         rd.addParameters(getParameters());
-        rd.addDataSetDefinition("MC-DSD", Mapped.mapStraightThrough(dataSetDefinition()));
+        rd.addDataSetDefinition("SMC-DSD", Mapped.mapStraightThrough(dataSetDefinition()));
         return rd;
     }
 
@@ -116,6 +126,20 @@ public class SetupSMCRegister extends UgandaEMRDataExportManager {
         dsd.setName(getName());
         dsd.addParameters(getParameters());
         dsd.addRowFilter(Cohorts.genderAndHasAncEncounter(false, true, "244da86d-f80e-48fe-aba9-067f241905ee"), "startDate=${startDate},endDate=${endDate}");
+
+        PatientIdentifierType serialNo= MetadataUtils.existing(PatientIdentifierType.class, "37601abe-2ee0-4493-8ac7-22b4972190cf");
+        DataConverter identifierFormatter = new ObjectFormatter("{identifier}");
+        DataDefinition identifierDef = new ConvertedPatientDataDefinition("identifier", new PatientIdentifierDataDefinition(serialNo.getName(), serialNo), identifierFormatter);
+
+        dsd.addColumn("Date", getEncounterDate(), "onOrAfter=${startDate},onOrBefore=${endDate}", new EncounterDataDefinitionConverter());
+        dsd.addColumn("Serial No", identifierDef, "");
+        dsd.addColumn("Names of Client", new PreferredNameDataDefinition(), (String) null);
+
         return dsd;
+    }
+
+    private DataDefinition getEncounterDate() {
+        EncountersForPatientDataDefinition enc = new EncountersForPatientDataDefinition("SMC");
+        return enc;
     }
 }
