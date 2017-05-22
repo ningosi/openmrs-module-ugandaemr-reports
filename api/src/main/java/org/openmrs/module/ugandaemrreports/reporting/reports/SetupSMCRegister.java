@@ -13,13 +13,13 @@
  */
 package org.openmrs.module.ugandaemrreports.reporting.reports;
 
+import org.openmrs.Concept;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
 import org.openmrs.module.reporting.data.patient.definition.ConvertedPatientDataDefinition;
-import org.openmrs.module.reporting.data.patient.definition.EncountersForPatientDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
@@ -28,15 +28,23 @@ import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
-import org.openmrs.module.ugandaemrreports.data.converter.EncounterDataDefinitionConverter;
+import org.openmrs.module.ugandaemrreports.data.converter.CalculationResultConverter;
+import org.openmrs.module.ugandaemrreports.data.converter.FaciltyAndOutReachDataConverter;
+import org.openmrs.module.ugandaemrreports.data.converter.STIDataConverter;
+import org.openmrs.module.ugandaemrreports.definition.data.definition.CalculationDataDefinition;
 import org.openmrs.module.ugandaemrreports.library.Cohorts;
 import org.openmrs.module.ugandaemrreports.library.DataFactory;
+import org.openmrs.module.ugandaemrreports.reporting.calculation.smc.AgeFromEncounterDateCalculation;
+import org.openmrs.module.ugandaemrreports.reporting.calculation.smc.SMCAdrressCalculation;
+import org.openmrs.module.ugandaemrreports.reporting.calculation.smc.SMCEncounterDateCalculation;
 import org.openmrs.module.ugandaemrreports.reporting.dataset.definition.SharedDataDefintion;
+import org.openmrs.module.ugandaemrreports.reporting.metadata.Dictionary;
 import org.openmrs.module.ugandaemrreports.reports.UgandaEMRDataExportManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -131,15 +139,42 @@ public class SetupSMCRegister extends UgandaEMRDataExportManager {
         DataConverter identifierFormatter = new ObjectFormatter("{identifier}");
         DataDefinition identifierDef = new ConvertedPatientDataDefinition("identifier", new PatientIdentifierDataDefinition(serialNo.getName(), serialNo), identifierFormatter);
 
-        dsd.addColumn("Date", getEncounterDate(), "onOrAfter=${startDate},onOrBefore=${endDate}", new EncounterDataDefinitionConverter());
+        dsd.addColumn("Date", getEncounterDate(), "onOrBefore=${endDate}", new CalculationResultConverter());
         dsd.addColumn("Serial No", identifierDef, "");
         dsd.addColumn("Names of Client", new PreferredNameDataDefinition(), (String) null);
+        dsd.addColumn("Age<2yrs", getAgeFromEncounterDate(0, 2), "onOrBefore=${endDate}", new CalculationResultConverter());
+        dsd.addColumn("Age2<5yrs", getAgeFromEncounterDate(2, 5), "onOrBefore=${endDate}", new CalculationResultConverter());
+        dsd.addColumn("Age5<15yrs", getAgeFromEncounterDate(5, 15), "onOrBefore=${endDate}", new CalculationResultConverter());
+        dsd.addColumn("Age15<49yrs", getAgeFromEncounterDate(15, 49), "onOrBefore=${endDate}", new CalculationResultConverter());
+        dsd.addColumn("Age<49yrs", getAgeFromEncounterDate(49, 200), "onOrBefore=${endDate}", new CalculationResultConverter());
+        dsd.addColumn("Address", address(), "onOrBefore=${endDate}", new CalculationResultConverter());
+        dsd.addColumn("Facility/Outreach", sdd.definition("Facility/Outreach", getConcept("ac44b5f2-cf57-43ca-bea0-8b392fe21802")), "onOrAfter=${startDate},onOrBefore=${endDate}", new FaciltyAndOutReachDataConverter());
+        dsd.addColumn("STI", sdd.definition("STI", getConcept("")), "onOrAfter=${startDate},onOrBefore=${endDate}", new STIDataConverter());
 
         return dsd;
     }
 
     private DataDefinition getEncounterDate() {
-        EncountersForPatientDataDefinition enc = new EncountersForPatientDataDefinition("SMC");
-        return enc;
+        CalculationDataDefinition cd = new CalculationDataDefinition("Date", new SMCEncounterDateCalculation());
+        cd.addParameter(new Parameter("onDate", "On Date", Date.class));
+        return cd;
+    }
+
+    private DataDefinition getAgeFromEncounterDate(Integer lower, Integer upper) {
+        CalculationDataDefinition cd = new CalculationDataDefinition("Date", new AgeFromEncounterDateCalculation());
+        cd.addParameter(new Parameter("onDate", "On Date", Date.class));
+        cd.addCalculationParameter("lower", lower);
+        cd.addCalculationParameter("upper", upper);
+        return cd;
+    }
+    private DataDefinition address() {
+        CalculationDataDefinition cd = new CalculationDataDefinition("address", new SMCAdrressCalculation());
+        cd.addParameter(new Parameter("onDate", "On Date", Date.class));
+        return cd;
+
+    }
+
+    private Concept getConcept(String uuid) {
+        return Dictionary.getConcept(uuid);
     }
 }
