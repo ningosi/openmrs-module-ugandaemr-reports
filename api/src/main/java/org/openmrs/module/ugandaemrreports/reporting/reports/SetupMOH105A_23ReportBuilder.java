@@ -20,11 +20,14 @@ import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.ugandaemrreports.library.Moh105IndicatorLibrary;
 import org.openmrs.module.ugandaemrreports.reporting.library.dimension.CommonReportDimensionLibrary;
+import org.openmrs.module.ugandaemrreports.reporting.utils.ColumnParameters;
+import org.openmrs.module.ugandaemrreports.reporting.utils.EmrReportingUtils;
 import org.openmrs.module.ugandaemrreports.reporting.utils.ReportUtils;
 import org.openmrs.module.ugandaemrreports.reports.UgandaEMRDataExportManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -87,6 +90,34 @@ public class SetupMOH105A_23ReportBuilder extends UgandaEMRDataExportManager {
         CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
         dsd.setParameters(getParameters());
         dsd.addDimension("age", ReportUtils.map(dimensionLibrary.standardAgeGroupsForAnc(), "onDate=${endDate}"));
+        dsd.addDimension("gender", ReportUtils.map(dimensionLibrary.gender()));
+
+        ColumnParameters female10To19 = new ColumnParameters("f10to19", "10-19", "gender=F|age=<11");
+        ColumnParameters female20To24 = new ColumnParameters("f20to24", "20-24", "gender=F|age=<21");
+        ColumnParameters female25Plus = new ColumnParameters("f25plus", ">=25", "gender=F|age=25+");
+
+        List<ColumnParameters> noTotalsColumns = Arrays.asList(female10To19, female20To24, female25Plus);
+        String params = "startDate=${startDate},endDate=${endDate}";
+        
+        //start building the columns for the report
+        EmrReportingUtils.addRow(dsd, "P1-A", "P1: Post Natal Attendances - Age group", ReportUtils.map(indicatorLibrary.pncAttendances(), params), noTotalsColumns, Arrays.asList("01","02","03"));
+        dsd.addColumn("P1-6H", "P1-6 Hours", ReportUtils.map(indicatorLibrary.pncAttendances("1822AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
+        dsd.addColumn("P1-6D", "P1-6 Days", ReportUtils.map(indicatorLibrary.pncAttendances("1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
+        dsd.addColumn("P1-6W", "P1-6 Weeks", ReportUtils.map(indicatorLibrary.pncAttendances("1073AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
+        dsd.addColumn("P1-6M", "P1-6 Months", ReportUtils.map(indicatorLibrary.pncAttendances("1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
+
+        dsd.addColumn("P2-1", "P2-1st test during postnatal - Breastfeeding mothers tested for HIV", ReportUtils.map(indicatorLibrary.pncAttendances("1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
+        dsd.addColumn("P2-2", "P2-Retest during postnatal - Breastfeeding mothers tested for HIV", ReportUtils.map(indicatorLibrary.pncAttendances("1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
+        dsd.addColumn("P3-1", "P3-1st test during postnatal - Breastfeeding mothers newly testing HIV+", ReportUtils.map(indicatorLibrary.pncAttendances("1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
+        dsd.addColumn("P3-2", "P3-Retest test during postnatal - Breastfeeding mothers newly testing HIV+", ReportUtils.map(indicatorLibrary.pncAttendances("1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
+
+        dsd.addColumn("P4", "Total HIV+ mothers attending postnatal", ReportUtils.map(indicatorLibrary.totaHivPositiveMothers(), params), "");
+        dsd.addColumn("P5", "HIV+ women initiating ART in PNC", ReportUtils.map(indicatorLibrary.hivPositiveWomenInitiatingART(), params), "");
+        dsd.addColumn("P6", "Mother-baby pairs enrolled at Mother-Baby care point", ReportUtils.map(indicatorLibrary.enrolledAtMotherBabyCarePoint(), params), "");
+        dsd.addColumn("P7", "Vitamin A supplimentation given to mothers", ReportUtils.map(indicatorLibrary.hasObs("dc918618-30ab-102d-86b0-7a5022ba4115", "680f7f8d-eac6-44b4-8899-101fa2c4f873"), params), "");
+        dsd.addColumn("P8", "Clients with pre-malignant condition of breast", ReportUtils.map(indicatorLibrary.hasObs("07c10f5c-17fd-4a7e-8d72-c2252f589da0", "5e416f86-aaf1-4ae4-96f0-30226b9fdd5f"), params), "");
+        dsd.addColumn("P9", "Clients with pre-malignant condition of cervix", ReportUtils.map(indicatorLibrary.hasObs("d858f8cb-fe9e-4131-8d91-cd9929cc53de", "ec3a0208-0261-450a-a13b-b524e160b8fd"), params), "");
+
 
 
         //connect the report definition to the dsd

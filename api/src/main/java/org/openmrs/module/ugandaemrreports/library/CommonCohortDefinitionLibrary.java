@@ -1,14 +1,17 @@
 package org.openmrs.module.ugandaemrreports.library;
 
 import org.openmrs.Concept;
+import org.openmrs.EncounterType;
 import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.EncounterCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.GenderCohortDefinition;
 import org.openmrs.module.reporting.common.DurationUnit;
 import org.openmrs.module.reporting.common.ObjectUtil;
 import org.openmrs.module.reporting.common.SetComparator;
+import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.definition.library.BaseDefinitionLibrary;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,6 +198,23 @@ public class CommonCohortDefinitionLibrary extends BaseDefinitionLibrary<CohortD
         cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
         if (answers.length > 0) {
             cd.setValueList(Arrays.asList(answers));
+        }
+        return cd;
+    }
+
+    /**
+     * Patients who have an encounter between ${onOrAfter} and ${onOrBefore}
+     * @param types the encounter types
+     * @return the cohort definition
+     */
+    public CohortDefinition hasEncounter(EncounterType... types) {
+        EncounterCohortDefinition cd = new EncounterCohortDefinition();
+        cd.setName("has encounter between dates");
+        cd.setTimeQualifier(TimeQualifier.ANY);
+        cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+        cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+        if (types.length > 0) {
+            cd.setEncounterTypeList(Arrays.asList(types));
         }
         return cd;
     }

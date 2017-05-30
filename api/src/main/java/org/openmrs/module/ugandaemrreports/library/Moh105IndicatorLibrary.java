@@ -14,6 +14,7 @@
 package org.openmrs.module.ugandaemrreports.library;
 
 import org.openmrs.Concept;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.openmrs.module.ugandaemrreports.reporting.metadata.Dictionary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -222,5 +223,30 @@ public class Moh105IndicatorLibrary {
     public CohortIndicator malePatinersRecievedHivResultHivPositive() {
         return cohortIndicator("Male partners received HIV test results in eMTCT - HIV+", map(cclibrary.hasObs(Dictionary.getConcept("62a37075-fc2a-4729-8950-b9fae9b22cfb"), Dictionary.getConcept("86e394fd-8d85-4cb3-86d7-d4b9bfc3e43a")), "onOrAfter=${startDate},onOrBefore=${endDate}"));
     }
+
+    /**
+     * Post natal attendances totals
+     * @return CohortIndicator
+     */
+    public CohortIndicator pncAttendances() {
+        return cohortIndicator("Total attendances", map(cclibrary.hasEncounter(Context.getEncounterService().getEncounterTypeByUuid("fa6f3ff5-b784-43fb-ab35-a08ab7dbf074")), "onOrAfter=${startDate},onOrBefore=${endDate}"));
+    }
+
+    /**
+     * Post natal attendances totals
+     * @return CohortIndicator
+     */
+    public CohortIndicator pncAttendances(String ans) {
+        return cohortIndicator("Total attendances Timing", map(cclibrary.hasObs(Dictionary.getConcept("1732AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), Dictionary.getConcept(ans)), "onOrAfter=${startDate},onOrBefore=${endDate}"));
+    }
+
+    /**
+     * The observations ahs some answers collected
+     */
+    public CohortIndicator hasObs(String q, String ans) {
+        return cohortIndicator("Has some obs", map(cclibrary.hasObs(Dictionary.getConcept(q), Dictionary.getConcept(ans)), "onOrAfter=${startDate},onOrBefore=${endDate}"));
+    }
+
+
 
 }
