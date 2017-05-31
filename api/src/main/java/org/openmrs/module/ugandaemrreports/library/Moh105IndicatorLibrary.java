@@ -247,6 +247,31 @@ public class Moh105IndicatorLibrary {
         return cohortIndicator("Has some obs", map(cclibrary.hasObs(Dictionary.getConcept(q), Dictionary.getConcept(ans)), "onOrAfter=${startDate},onOrBefore=${endDate}"));
     }
 
+    /**
+     * Total HIV+ mothers attending postnatal
+     * @return CohortIndicator
+     */
+    public CohortIndicator totaHivPositiveMothers() {
+        return cohortIndicator("Total HIV+ mothers attending postnatal", map(cohortLibrary.totaHivPositiveMothers(), "onOrAfter=${startDate},onOrBefore=${endDate}"));
+    }
 
+    /**
+     * Hiv+ women initiating ART in PNC
+     * @return CohortIndicator
+     */
+    public CohortIndicator hivPositiveWomenInitiatingART() {
+        Concept art = Dictionary.getConcept("a615f932-26ee-449c-8e20-e50a15232763");
+        Concept ans = Dictionary.getConcept("026e31b7-4a26-44d0-8398-9a41c40ff7d3");
+
+        return cohortIndicator("Hiv positive women initiating ART in PNC", map(cclibrary.hasObs(art, ans), "onOrAfter=${startDate},onOrBefore=${endDate}"));
+    }
+
+    /**
+     * Mother-baby pairs enrolled at Mother-Baby care point
+     * @return CohortIndicator
+     */
+    public CohortIndicator enrolledAtMotherBabyCarePoint() {
+        return cohortIndicator("Mother-baby pairs enrolled at Mother-Baby care point", map(cclibrary.hasObs(Dictionary.getConcept(""), Dictionary.getConcept("")), "onOrAfter=${startDate},onOrBefore=${endDate}"));
+    }
 
 }

@@ -96,4 +96,28 @@ public class Moh105CohortLibrary {
         return cd;
     }
 
+    /**
+     * Total HIV+ mothers attending postnatal
+     * Those who are hiv postive
+     * Counselled tested and results given - Client tested HIV+ in PNC,
+     *Client tested HIV+ on a re-test
+     * Client tested on previous visit with known HIV+ status
+     */
+    public CohortDefinition totaHivPositiveMothers() {
+        Concept emtctQ = Dictionary.getConcept("d5b0394c-424f-41db-bc2f-37180dcdbe74");
+        Concept hivStatus = Dictionary.getConcept("dce0e886-30ab-102d-86b0-7a5022ba4115");
+        Concept hivPositive = Dictionary.getConcept("dcdf4241-30ab-102d-86b0-7a5022ba4115");
+        Concept trr = Dictionary.getConcept("86e394fd-8d85-4cb3-86d7-d4b9bfc3e43a");
+        Concept trrPlus = Dictionary.getConcept("60155e4d-1d49-4e97-9689-758315967e0f");
+        Concept trrTick = Dictionary.getConcept("1f177240-85f6-4f10-964a-cfc7722408b3");
+
+        CompositionCohortDefinition cd = new CompositionCohortDefinition();
+        cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+        cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
+        cd.addSearch("hivStatusPositive", ReportUtils.map(definitionLibrary.hasObs(hivStatus, hivPositive), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore}"));
+        cd.addSearch("emctCodes", ReportUtils.map(definitionLibrary.hasObs(emtctQ, trr, trrPlus, trrTick), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore}"));
+        cd.setCompositionString("hivStatusPositive OR emctCodes");
+        return cd;
+    }
+
 }
