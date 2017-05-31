@@ -271,7 +271,57 @@ public class Moh105IndicatorLibrary {
      * @return CohortIndicator
      */
     public CohortIndicator enrolledAtMotherBabyCarePoint() {
-        return cohortIndicator("Mother-baby pairs enrolled at Mother-Baby care point", map(cclibrary.hasObs(Dictionary.getConcept(""), Dictionary.getConcept("")), "onOrAfter=${startDate},onOrBefore=${endDate}"));
+        return cohortIndicator("Mother-baby pairs enrolled at Mother-Baby care point", map(cohortLibrary.motherBabyEnrolled(), "onOrAfter=${startDate},onOrBefore=${endDate}"));
+    }
+
+    /**
+     * Breastfeeding mothers tested for HIV 1st test during postnatal
+     * @return CohortIndicator
+     */
+    public CohortIndicator breastFeedingMothersTestedForHIVFirstTestDuringPostnatal() {
+        Concept t = Dictionary.getConcept("05f16fc5-1d82-4ce8-9b44-a3125fbbf2d7");
+        Concept tr = Dictionary.getConcept("86e394fd-8d85-4cb3-86d7-d4b9bfc3e43a");
+        Concept trr = Dictionary.getConcept("25c448ff-5fe4-4a3a-8c0a-b5aaea9d5465");
+        Concept trrTick = Dictionary.getConcept("1f177240-85f6-4f10-964a-cfc7722408b3");
+        Concept trTick = Dictionary.getConcept("81bd3e58-9389-41e7-be1a-c6723f899e56");
+        Concept question = Dictionary.getConcept("d5b0394c-424f-41db-bc2f-37180dcdbe74");
+        return cohortIndicator("Breastfeeding mothers tested for HIV 1st test during postnatal", map(cclibrary.hasObs(question, t, tr, trTick, trrTick, trr), "onOrAfter=${startDate},onOrBefore=${endDate}"));
+    }
+
+    /**
+     * Breastfeeding mothers tested for HIV 1st test during postnatal
+     * @return CohortIndicator
+     */
+    public CohortIndicator breastFeedingMothersTestedForHIVReTestDuringPostnatal() {
+        Concept question = Dictionary.getConcept("d5b0394c-424f-41db-bc2f-37180dcdbe74");
+        Concept trPlus = Dictionary.getConcept("60155e4d-1d49-4e97-9689-758315967e0f");
+        Concept trrPlus = Dictionary.getConcept("a08d9331-b437-485c-8eff-1923f3d43630");
+
+        return cohortIndicator("Breastfeeding mothers tested for HIV re test during postnatal", map(cclibrary.hasObs(question, trPlus, trrPlus), "onOrAfter=${startDate},onOrBefore=${endDate}"));
+    }
+
+    /**
+     * Breastfeeding mothers tested for HIV+ 1st test during postnatal
+     * @return CohortIndicator
+     */
+    public CohortIndicator breastFeedingMothersTestedForHIVPositiveTestDuringPostnatal() {
+        Concept question = Dictionary.getConcept("d5b0394c-424f-41db-bc2f-37180dcdbe74");
+        Concept trPlus = Dictionary.getConcept("25c448ff-5fe4-4a3a-8c0a-b5aaea9d5465");
+        Concept trrPlus = Dictionary.getConcept("1f177240-85f6-4f10-964a-cfc7722408b3");
+
+        return cohortIndicator("Breastfeeding mothers tested for HIV+  test during postnatal", map(cclibrary.hasObs(question, trPlus, trrPlus), "onOrAfter=${startDate},onOrBefore=${endDate}"));
+    }
+
+    /**
+     * Breastfeeding mothers tested for HIV+ retest test during postnatal
+     * @return CohortIndicator
+     */
+    public CohortIndicator breastFeedingMothersTestedForHIVPositiveReTestDuringPostnatal() {
+        Concept question = Dictionary.getConcept("d5b0394c-424f-41db-bc2f-37180dcdbe74");
+        Concept trPlus = Dictionary.getConcept("60155e4d-1d49-4e97-9689-758315967e0f");
+
+
+        return cohortIndicator("Breastfeeding mothers tested for HIV+  test during postnatal", map(cclibrary.hasObs(question, trPlus), "onOrAfter=${startDate},onOrBefore=${endDate}"));
     }
 
 }

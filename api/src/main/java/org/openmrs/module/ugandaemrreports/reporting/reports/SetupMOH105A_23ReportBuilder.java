@@ -25,6 +25,7 @@ import org.openmrs.module.ugandaemrreports.reporting.utils.EmrReportingUtils;
 import org.openmrs.module.ugandaemrreports.reporting.utils.ReportUtils;
 import org.openmrs.module.ugandaemrreports.reports.UgandaEMRDataExportManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +35,7 @@ import java.util.List;
 /**
  * Created by Nicholas Ingosi on 5/29/17.
  */
+@Component
 public class SetupMOH105A_23ReportBuilder extends UgandaEMRDataExportManager {
 
     @Autowired
@@ -106,10 +108,10 @@ public class SetupMOH105A_23ReportBuilder extends UgandaEMRDataExportManager {
         dsd.addColumn("P1-6W", "P1-6 Weeks", ReportUtils.map(indicatorLibrary.pncAttendances("1073AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
         dsd.addColumn("P1-6M", "P1-6 Months", ReportUtils.map(indicatorLibrary.pncAttendances("1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
 
-        dsd.addColumn("P2-1", "P2-1st test during postnatal - Breastfeeding mothers tested for HIV", ReportUtils.map(indicatorLibrary.pncAttendances("1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
-        dsd.addColumn("P2-2", "P2-Retest during postnatal - Breastfeeding mothers tested for HIV", ReportUtils.map(indicatorLibrary.pncAttendances("1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
-        dsd.addColumn("P3-1", "P3-1st test during postnatal - Breastfeeding mothers newly testing HIV+", ReportUtils.map(indicatorLibrary.pncAttendances("1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
-        dsd.addColumn("P3-2", "P3-Retest test during postnatal - Breastfeeding mothers newly testing HIV+", ReportUtils.map(indicatorLibrary.pncAttendances("1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), params), "");
+        dsd.addColumn("P2-1", "P2-1st test during postnatal - Breastfeeding mothers tested for HIV", ReportUtils.map(indicatorLibrary.breastFeedingMothersTestedForHIVFirstTestDuringPostnatal(), params), "");
+        dsd.addColumn("P2-2", "P2-Retest during postnatal - Breastfeeding mothers tested for HIV", ReportUtils.map(indicatorLibrary.breastFeedingMothersTestedForHIVReTestDuringPostnatal(), params), "");
+        dsd.addColumn("P3-1", "P3-1st test during postnatal - Breastfeeding mothers newly testing HIV+", ReportUtils.map(indicatorLibrary.breastFeedingMothersTestedForHIVPositiveTestDuringPostnatal(), params), "");
+        dsd.addColumn("P3-2", "P3-Retest test during postnatal - Breastfeeding mothers newly testing HIV+", ReportUtils.map(indicatorLibrary.breastFeedingMothersTestedForHIVPositiveReTestDuringPostnatal(), params), "");
 
         dsd.addColumn("P4", "Total HIV+ mothers attending postnatal", ReportUtils.map(indicatorLibrary.totaHivPositiveMothers(), params), "");
         dsd.addColumn("P5", "HIV+ women initiating ART in PNC", ReportUtils.map(indicatorLibrary.hivPositiveWomenInitiatingART(), params), "");

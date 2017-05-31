@@ -14,6 +14,7 @@
 package org.openmrs.module.ugandaemrreports.library;
 
 import org.openmrs.Concept;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -117,6 +118,20 @@ public class Moh105CohortLibrary {
         cd.addSearch("hivStatusPositive", ReportUtils.map(definitionLibrary.hasObs(hivStatus, hivPositive), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore}"));
         cd.addSearch("emctCodes", ReportUtils.map(definitionLibrary.hasObs(emtctQ, trr, trrPlus, trrTick), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore}"));
         cd.setCompositionString("hivStatusPositive OR emctCodes");
+        return cd;
+    }
+
+    /**
+     * Mother-baby pairs enrolled at Mother-Baby care point
+     * @return CohortDefinition
+     */
+    public CohortDefinition motherBabyEnrolled() {
+        CompositionCohortDefinition cd = new CompositionCohortDefinition();
+        cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+        cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
+        cd.addSearch("hasEncounter", ReportUtils.map(definitionLibrary.hasEncounter(Context.getEncounterService().getEncounterTypeByUuid("fa6f3ff5-b784-43fb-ab35-a08ab7dbf074")), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore}"));
+        cd.addSearch("babyAl", ReportUtils.map(definitionLibrary.hasObs(Dictionary.getConcept("dd8a2ad9-16f6-44db-82d7-87d6eef14886"), Dictionary.getConcept("9d9e6b5a-8b5d-4b8c-8ab7-9fdabb279493")), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore}"));
+        cd.setCompositionString("hasEncounter AND babyAl");
         return cd;
     }
 
